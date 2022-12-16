@@ -3,6 +3,7 @@ package com.kocheng.demo1.controllers;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -11,12 +12,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -40,7 +41,7 @@ public class ProductController {
 
 	// get by uri
 	@GetMapping(value = "/products/{id}")
-	public ResponseEntity<Product> getProduct (@PathVariable("id") String id) {
+	public ResponseEntity<Product> getProduct(@PathVariable("id") String id) {
 		Optional<Product> item = productDB.stream().filter(p -> p.getId().equals(id)).findFirst();
 
 		if (!item.isPresent()) {
@@ -52,12 +53,29 @@ public class ProductController {
 
 	// get mulit product by param
 	@GetMapping("/products")
-	public ResponseEntity<List<Product>> getProducts (@RequestParam(value = "key", defaultValue = "") String name) {
-		List<Product> list = productDB.stream()
-			.filter(p -> p.getName().toUpperCase().contains(name.toUpperCase()))
-			.collect(Collectors.toList());
+	public ResponseEntity<List<Product>> getProducts(@ModelAttribute Product.ProductQuery pq) {
+		List<Product> products = productDB.stream()
+				.filter(p -> p.getName().toUpperCase().contains(pq.getKey()))
+				.sorted((p1, p2) -> {
+					if (Objects.isNull(pq.getOrder()) ||
+							Objects.isNull(pq.getSortRule()) ||
+							pq.getOrder().isEmpty())
+						return 0;
 
-		return ResponseEntity.ok().body(list);
+					if (pq.getOrder().toLowerCase().equals("price")) {
+						if(pq.getSortRule().equals("desc")) return p1.getPrice() < p2.getPrice() ? 1 : -1;
+						return p1.getPrice() > p2.getPrice() ? 1 : -1;
+					}
+
+					if (pq.getOrder().toLowerCase().equals("name")) {
+						if(pq.getSortRule().equals("desc")) return p1.getName().length() < p2.getName().length() ? 1 : -1;
+						return p1.getName().length() > p2.getName().length() ? 1 : -1;
+					}
+					return 0;
+				})
+				.collect(Collectors.toList());
+
+		return ResponseEntity.ok().body(products);
 	}
 
 	@PostMapping("/products")
@@ -68,35 +86,34 @@ public class ProductController {
 		}
 
 		Product p = new Product(
-			req.getId(),
-			req.getName(),
-			req.getPrice());
+				req.getId(),
+				req.getName(),
+				req.getPrice());
 
 		productDB.add(p);
 
 		// 建立該商品得網址
 		URI loc = ServletUriComponentsBuilder
-			.fromCurrentRequest().path("/{id}")
-			.buildAndExpand(p.getId())
-			// 可多值 e.g.
-			// .fromCurrentRequest().path("/{id}/{name}")
-			// .buildAndExpand(p.getId(), p.getPrice())
-			.toUri();
+				.fromCurrentRequest().path("/{id}")
+				.buildAndExpand(p.getId())
+				// 可多值 e.g.
+				// .fromCurrentRequest().path("/{id}/{name}")
+				// .buildAndExpand(p.getId(), p.getPrice())
+				.toUri();
 
 		// 201 createdcode 並將該商品網址放到 header Location 欄位
 		return ResponseEntity.created(loc).body(p);
 	}
 
-
 	@PutMapping("/products/{id}")
-	public ResponseEntity<Product> updateProduct(@PathVariable("id") String id,  @RequestBody Product req) {
+	public ResponseEntity<Product> updateProduct(@PathVariable("id") String id, @RequestBody Product req) {
 		Optional<Product> op = productDB.stream()
-			.filter(p -> p.getId().equals(id))
-			.findFirst();
+				.filter(p -> p.getId().equals(id))
+				.findFirst();
 
-		if(!op.isPresent()){
+		if (!op.isPresent()) {
 			return ResponseEntity.notFound().build();
-		} 
+		}
 
 		Product p = op.get();
 		p.setName(req.getName());
