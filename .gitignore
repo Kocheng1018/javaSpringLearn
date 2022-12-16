@@ -1,0 +1,66 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.gradle
+.project
+.settings
+.metadata
+.classpath
+.sts4-cache
+.attach_pid*
+.factorypath
+.springBeans
+.springBeans
+.recommenders
+.apt_generated
+.flattened-pom.xml
+.gradletasknamecache
+
+bin
+out
+/code
+_site/
+dump.rdb
+secrets.yml
+MANIFEST.MF
+overridedb.*
+manifest.yml
+activemq-data
+interpolated*.xml
+dependency-reduced-pom.xml
+
+### IntelliJ IDEA ###
+
+.#*
+.idea
+.*.md.html
+
+*#
+*~
+*.jar
+*.sw?
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+lib/
+build/
+/dist/
+/nbdist/
+/nbbuild/
+build.log
+/.nb-gradle/
+!/**/src/**/bin
+!/**/src/**/build
+/nbproject/private/
+
+### VS Code ###
+.vscode/
+
+# mac
+.DS_Store
