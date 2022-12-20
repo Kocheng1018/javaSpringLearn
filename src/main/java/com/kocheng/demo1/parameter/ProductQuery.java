@@ -2,6 +2,8 @@ package com.kocheng.demo1.parameter;
 
 public class ProductQuery {
 	private String key;
+	private Integer priceFrom;
+	private Integer priceTo;
 	private String order;
 	private String sortRule;
 
@@ -15,6 +17,14 @@ public class ProductQuery {
 
 	public String getSortRule() {
 		return sortRule;
+	}
+
+	public Integer getPriceFrom() {
+		return priceFrom;
+	}
+
+	public Integer getPriceTo() {
+		return priceTo;
 	}
 
 	public void setKey(String key) {

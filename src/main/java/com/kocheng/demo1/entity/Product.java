@@ -1,12 +1,12 @@
 package com.kocheng.demo1.entity;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "products")
 public class Product {
 	private String id;
 	private String name;
 	private int price;
-
-	public Product() {
-	};
 
 	public Product(String id, String name, int price) {
 		this.id = id;
