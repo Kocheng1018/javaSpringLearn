@@ -24,16 +24,10 @@ public class ProductService {
     private ProductRepostory repostory;
 
     public Product createProduct(Product p) throws UnprocessableEntity {
-        Product item = new Product(p.getId(), p.getName(), p.getPrice());
+        Product item = new Product(p.getName(), p.getPrice());
 
         return repostory.insert(item);
 
-        // boolean isIdDuplicated = productDAO.find(p.getId()).isPresent();
-        // if (isIdDuplicated)
-        // throw new UnprocessableEntity("The id of the Product is duplicated");
-
-        // Product item = new Product(p.getId(), p.getName(), p.getPrice());
-        // return productDAO.insert(item);
     }
 
     public Product getProduct(String id) throws NotFoundException {
